@@ -14,6 +14,6 @@ document.getElementById("login-form").addEventListener("submit", function(event)
 
 function isValidEmail(email) {
   // 使用正则表达式验证邮箱格式
-  var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailPattern.test(email);
 }

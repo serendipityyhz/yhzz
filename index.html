@@ -37,8 +37,8 @@
 
   function validateForm() {
     // 这里放置您的密码验证逻辑
-    var password = document.getElementById("password").value;
-    var confirmPassword = document.getElementById("confirm-password").value;
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirm-password").value;
 
     // 验证密码长度
     if (password.length < 8) {
@@ -59,7 +59,7 @@
     }
 
     // 验证确认密码
-    if (password != confirmPassword) {
+    if (password !== confirmPassword) {
       document.getElementById("confirm-password-error").innerHTML = "确认密码与密码不匹配";
       return false;
     } else {

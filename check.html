@@ -11,9 +11,6 @@
       cursor: pointer;
       text-decoration: underline;
     }
-    .details {
-      display: none;
-    }
 
     /* 添加响应式设计 */
     @media (max-width: 768px) {
@@ -46,18 +43,18 @@
     <div class="row mb-3">
       <div class="col">
         <!-- Search Input -->
-        <input type="text" id="searchInput" class="form-control" placeholder="搜索任务...">
+        <label for="searchInput"></label><input type="text" id="searchInput" class="form-control" placeholder="搜索任务...">
       </div>
       <div class="col">
         <!-- Sort Selector -->
-        <select id="sortSelector" class="form-control">
+        <label for="sortSelector"></label><select id="sortSelector" class="form-control">
           <option value="completionDateAsc">完成日期升序</option>
           <option value="completionDateDesc">完成日期降序</option>
         </select>
       </div>
       <div class="col">
         <!-- Status Filter -->
-        <select id="statusFilter" class="form-control">
+        <label for="statusFilter"></label><select id="statusFilter" class="form-control">
           <option value="all">所有状态</option>
           <option value="未开始">未开始</option>
           <option value="进行中">进行中</option>
