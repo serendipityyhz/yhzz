@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Registration</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+<form id="register-form" onsubmit="return validateForm()">
+  <label for="username">用户名：</label>
+  <input type="text" id="username" name="username" required>
+
+  <label for="email">电子邮箱：</label>
+  <input type="email" id="email" name="email" required>
+  <span id="email-error" style="color: red;"></span>
+
+  <label for="password">密码：</label>
+  <input type="password" id="password" name="password" required minlength="8">
+  <span id="password-error" style="color: red;"></span>
+
+  <label for="confirm-password">确认密码：</label>
+  <input type="password" id="confirm-password" name="confirm-password" required>
+  <span id="confirm-password-error" style="color: red;"></span>
+
+  <button type="button" onclick="validateAndRedirect()">注册</button>
+
+</form>
+<script>
+  function validateAndRedirect() {
+    // 执行邮箱和密码验证
+    if (validateEmail() && validateForm()) {
+      // 如果验证通过，执行页面跳转
+      window.location.href = "login.html";
+    }
+  }
+
+  function validateForm() {
+    // 这里放置您的密码验证逻辑
+    var password = document.getElementById("password").value;
+    var confirmPassword = document.getElementById("confirm-password").value;
+
+    // 验证密码长度
+    if (password.length < 8) {
+      document.getElementById("password-error").innerHTML = "密码长度至少为8个字符";
+      return false;
+    } else {
+      document.getElementById("password-error").innerHTML = "";
+    }
+
+    // 验证密码是否包含字母和数字
+    var letterPattern = /[a-zA-Z]/;
+    var numberPattern = /[0-9]/;
+    if (!letterPattern.test(password) || !numberPattern.test(password)) {
+      document.getElementById("password-error").innerHTML = "密码必须包含字母和数字";
+      return false;
+    } else {
+      document.getElementById("password-error").innerHTML = "";
+    }
+
+    // 验证确认密码
+    if (password != confirmPassword) {
+      document.getElementById("confirm-password-error").innerHTML = "确认密码与密码不匹配";
+      return false;
+    } else {
+      document.getElementById("confirm-password-error").innerHTML = "";
+    }
+
+    // 如果所有验证通过，返回true
+    return true;
+  }
+
+  function validateEmail() {
+    // 获取邮箱输入框的值
+    var email = document.getElementById("email").value;
+    // 使用正则表达式验证邮箱格式
+    var emailPattern = /\S+@\S+\.\S+/;
+    if (!emailPattern.test(email)) {
+      // 如果邮箱格式不正确，显示错误信息并返回false
+      document.getElementById("email-error").innerHTML = "请输入有效的电子邮箱地址";
+      return false;
+    } else {
+      // 如果邮箱格式正确，清除错误信息并返回true
+      document.getElementById("email-error").innerHTML = "";
+      return true;
+    }
+  }
+
+</script>
+</body>
+</html>

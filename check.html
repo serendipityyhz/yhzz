@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>任务查看</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/css/adminlte.min.css">
+  <style>
+    .editable {
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .details {
+      display: none;
+    }
+
+    /* 添加响应式设计 */
+    @media (max-width: 768px) {
+      .task-details {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+
+<div class="wrapper">
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0">任务列表</h1>
+          </div><!-- /.col -->
+          <div class="col-sm-6">
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+    <!-- Filters Section -->
+    <div class="row mb-3">
+      <div class="col">
+        <!-- Search Input -->
+        <input type="text" id="searchInput" class="form-control" placeholder="搜索任务...">
+      </div>
+      <div class="col">
+        <!-- Sort Selector -->
+        <select id="sortSelector" class="form-control">
+          <option value="completionDateAsc">完成日期升序</option>
+          <option value="completionDateDesc">完成日期降序</option>
+        </select>
+      </div>
+      <div class="col">
+        <!-- Status Filter -->
+        <select id="statusFilter" class="form-control">
+          <option value="all">所有状态</option>
+          <option value="未开始">未开始</option>
+          <option value="进行中">进行中</option>
+          <option value="已完成">已完成</option>
+        </select>
+      </div>
+    </div>
+
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card">
+              <div class="card-body">
+                <ul id="task-list" class="list-group">
+                  <!-- Tasks will be dynamically added through JavaScript -->
+                </ul>
+              </div>
+              <div class="card-footer text-center">
+                <button class="btn btn-primary" onclick="addTask()">添加任务</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/js/adminlte.min.js"></script>
+
+<script>
+  // Assume this is the task data fetched from the server
+  let tasks = [
+    { id: 1, name: '任务1', content: '任务1内容', status: '未开始', priority: '高', dueDate: null, completionDate: null, date: null },
+    { id: 2, name: '任务2', content: '任务2内容', status: '进行中', priority: '中', dueDate: null, completionDate: null, date: null },
+    { id: 3, name: '任务3', content: '任务3内容', status: '已完成', priority: '低', dueDate: '2024-04-24', completionDate: '2024-04-24', date: '2024-04-24' },
+    { id: 4, name: '任务4', content: '任务4内容', status: '已完成', priority: '低', dueDate: '2024-04-23', completionDate: '2024-04-23', date: '2024-04-23' }
+  ];
+
+  const taskList = $('#task-list');
+
+  // Existing JavaScript code...
+  // ...
+
+  // Event handler for search input
+  $('#searchInput').on('input', function() {
+    const searchTerm = $(this).val().toLowerCase();
+    const filteredTasks = tasks.filter(task =>
+      task.name.toLowerCase().includes(searchTerm) ||
+      task.content.toLowerCase().includes(searchTerm)
+    );
+    renderTasks(filteredTasks);
+  });
+
+  // Event handler for sort selector
+  $('#sortSelector').on('change', function() {
+    const sortType = $(this).val();
+    const sortedTasks = [...tasks].sort((a, b) => {
+      const dateA = new Date(a.completionDate || 0);
+      const dateB = new Date(b.completionDate || 0);
+      return sortType === 'completionDateAsc' ? dateA - dateB : dateB - dateA;
+    });
+    renderTasks(sortedTasks);
+  });
+
+  // Event handler for status filter
+  $('#statusFilter').on('change', function() {
+    const status = $(this).val();
+    const filteredTasks = status === 'all' ? tasks : tasks.filter(task => task.status === status);
+    renderTasks(filteredTasks);
+  });
+
+  // Render tasks function - No change
+  // ...
+
+  // Document ready function - No change
+  // ...
+
+
+  // Function to add a new task
+  function addTask() {
+    let newName = prompt('请输入任务名称:');
+    if (!newName || newName.trim() === "") {
+      alert('任务名称不能为空');
+      return;
+    }
+    let newContent = prompt('请输入任务内容:');
+    if (!newContent || newContent.trim() === "") {
+      alert('任务内容不能为空');
+      return;
+    }
+    let dueDateInput = prompt('请选择截止日期(YYYY-MM-DD):');
+    while (dueDateInput && !isValidDate(dueDateInput)) {
+      alert('请输入正确的日期格式 (YYYY-MM-DD)');
+      dueDateInput = prompt('请选择截止日期(YYYY-MM-DD):');
+    }
+    const newTask = {
+      id: tasks.length + 1,
+      name: newName.trim(),
+      content: newContent.trim(),
+      status: '未开始',
+      priority: '未设置',
+      dueDate: dueDateInput || '未设置',
+      completionDate: null,
+      originalCompletionDate: null
+    };
+    tasks.push(newTask);
+    renderTasks();
+  }
+
+  // Function to edit a task
+  function editTask(taskId, field, value) {
+    const task = tasks.find(task => task.id === taskId);
+    if (!value) return;  // Handle cancel case
+    if (field === 'dueDate' || field === 'completionDate') {
+      if (!isValidDate(value.trim())) {
+        alert('请输入正确的日期格式 (YYYY-MM-DD)');
+        return;
+      }
+    } else if (field === 'priority' && !['低', '中', '高'].includes(value.trim())) {
+      alert('优先级只能是 低、中、高 中的一种');
+      return;
+    }
+    task[field] = value.trim();
+    renderTasks();
+  }
+
+  // Function to toggle task status
+  function toggleTaskStatus(taskId) {
+    const task = tasks.find(task => task.id === taskId);
+    const newStatus = task.status === '未开始' ? '进行中' : task.status === '进行中' ? '已完成' : '未开始';
+    if (newStatus === '已完成' && task.status !== '已完成') {
+      task.originalCompletionDate = task.completionDate || new Date().toISOString().slice(0, 10);
+      task.completionDate = new Date().toISOString().slice(0, 10);
+    }
+    task.status = newStatus;
+    renderTasks();
+  }
+
+  // Function to restore original completion date
+  function restoreOriginalCompletionDate(taskId) {
+    const task = tasks.find(task => task.id === taskId);
+    if (task.originalCompletionDate) {
+      task.completionDate = task.originalCompletionDate;
+      renderTasks();
+    } else {
+      alert('没有可恢复的原始完成日期。');
+    }
+  }
+
+  // Function to manually edit the due date
+  function editDueDate(taskId) {
+    const task = tasks.find(task => task.id === taskId);
+    const newDate = prompt('请输入新的截止日期 (YYYY-MM-DD):', task.dueDate);
+    if (newDate && isValidDate(newDate)) {
+      task.dueDate = newDate;
+      renderTasks();
+    } else if (newDate) {
+      alert('请输入正确的日期格式 (YYYY-MM-DD)');
+    }
+  }
+
+  // Function to delete a task
+  function deleteTask(taskId) {
+    const confirmation = confirm('您确定要删除该任务吗？');
+    if (confirmation) {
+      tasks = tasks.filter(task => task.id !== taskId);
+      renderTasks();
+    }
+  }
+
+  // Function to toggle task details
+  function toggleDetails(taskId) {
+    $(`#task-list li:nth-child(${taskId}) .task-details`).slideToggle();
+  }
+
+  // Function to check if input is a valid date
+  function isValidDate(dateString) {
+    const regEx = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateString.match(regEx)) return false;
+    const d = new Date(dateString);
+    if (!d.getTime()) return false;
+    return d.toISOString().slice(0, 10) === dateString;
+  }
+
+
+
+  // Function to render task list
+  function renderTasks(tasksToRender = tasks) {
+    taskList.empty();
+    tasksToRender.forEach(task => {
+      const listItem = $('<li>').addClass('list-group-item');
+      listItem.addClass(`list-group-item-${task.status === '已完成' ? 'success' : task.status === '进行中' ? 'warning' : 'danger'}`);
+      const completionDateHtml = task.status === '已完成' && task.completionDate ? `- 完成日期: ${task.completionDate}` : '';
+      listItem.html(`
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <span class="fw-bold editable" onclick="editTask(${task.id}, 'name', prompt('请输入新的任务名称:', '${task.name}'))">${task.name}</span>
+          <span class="badge ${task.status === '已完成' ? 'bg-success' : task.status === '进行中' ? 'bg-warning' : 'bg-danger'} editable">${task.status}</span>
+          <span class="text-muted">${completionDateHtml}</span>
+          <div class="task-details" style="display: none;">
+            <p>任务详情：${task.content}</p>
+            <button class="btn btn-sm btn-info" onclick="editTask(${task.id}, 'content', prompt('请输入新的任务内容:', '${task.content}'))"><i class="fas fa-edit"></i></button>
+          </div>
+          <span class="badge bg-primary editable" onclick="editTask(${task.id}, 'priority', prompt('请输入新的优先级:', '${task.priority}'))">${task.priority}</span>
+          <span class="badge bg-warning editable" onclick="editTask(${task.id}, 'dueDate', prompt('请选择新的截止日期(YYYY-MM-DD):', '${task.dueDate}'))">${task.dueDate}</span>
+        </div>
+        <div>
+          <button class="btn btn-success btn-sm" onclick="toggleTaskStatus(${task.id})"><i class="fas fa-toggle-on"></i></button>
+          <button class="btn btn-danger btn-sm" onclick="deleteTask(${task.id})"><i class="fas fa-trash-alt"></i></button>
+          <button class="btn btn-primary btn-sm" onclick="toggleDetails(${task.id})"><i class="fas fa-info-circle"></i></button>
+          <button class="btn btn-info btn-sm" onclick="editDueDate(${task.id})"><i class="fas fa-calendar-alt"></i></button>
+          ${task.status === '已完成' ? `<button class="btn btn-secondary btn-sm" onclick="restoreOriginalCompletionDate(${task.id})"><i class="fas fa-undo-alt"></i></button>` : ''}
+        </div>
+      </div>
+    `);
+      taskList.append(listItem);
+    });
+  }
+
+  // Rest of the functions remain unchanged
+
+  $(document).ready(function() {
+    renderTasks();
+  });
+
+</script>
+
+
+</body>
+</html>
